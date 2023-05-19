@@ -62,7 +62,7 @@ func init() {
 	// Cobra supports persistent flags, which, if defined here,
 	// will be global for your application.
 
-	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.mypocket.yaml)")
+	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.mypocket/config)")
 
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
@@ -80,9 +80,9 @@ func initConfig() {
 		cobra.CheckErr(err)
 
 		// Search config in home directory with name ".mypocket" (without extension).
-		viper.AddConfigPath(home)
+		viper.AddConfigPath(fmt.Sprintf(`%s/.mypocket`, home))
+		viper.SetConfigName("config")
 		viper.SetConfigType("yaml")
-		viper.SetConfigName(".mypocket")
 	}
 
 	viper.AutomaticEnv() // read in environment variables that match
@@ -91,4 +91,9 @@ func initConfig() {
 	if err := viper.ReadInConfig(); err == nil {
 		fmt.Fprintln(os.Stderr, "Using config file:", viper.ConfigFileUsed())
 	}
+}
+
+type Config struct {
+	ConsumerKey string
+	AccessToken string
 }
