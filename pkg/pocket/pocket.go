@@ -3,6 +3,7 @@ package pocket
 import (
 	"bytes"
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -12,12 +13,14 @@ import (
 	"net/url"
 
 	"github.com/skratchdot/open-golang/open"
+	"github.com/spf13/viper"
 )
 
 type PocketClientInterface interface {
 	GetAuthCode(ctx context.Context, consumerKey string) (string, error)
 	Authorize(ctx context.Context, code string) (string, error)
 	GetAccessToken(ctx context.Context, consumerKey string, code string) (string, error)
+	AddArticle(ctx context.Context, URL string) error
 }
 
 type PocketClient struct{}
@@ -124,4 +127,45 @@ func (u *PocketClient) GetAccessToken(ctx context.Context, consumerKey, code str
 	}
 
 	return accessToken, nil
+}
+
+func (u *PocketClient) AddArticle(ctx context.Context, URL string) error {
+
+	endpoint := "https://getpocket.com/v3/add"
+
+	param := struct {
+		URL         string `json:"url"`
+		ConsumerKey string `json:"consumer_key"`
+		AccessToken string `json:"access_token"`
+	}{
+		URL:         URL,
+		ConsumerKey: viper.GetString("consumer_key"),
+		AccessToken: viper.GetString("access_token"),
+	}
+
+	data, err := json.Marshal(param)
+	if err != nil {
+		return err
+	}
+
+	fmt.Println(string(data))
+
+	req, err := http.NewRequest("POST", endpoint, bytes.NewBuffer(data))
+	if err != nil {
+		return err
+	}
+	req.Header.Set("Content-Type", "application/json")
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("pocket api response status code: %d", resp.StatusCode)
+	}
+
+	return nil
 }

@@ -92,8 +92,3 @@ func initConfig() {
 		fmt.Fprintln(os.Stderr, "Using config file:", viper.ConfigFileUsed())
 	}
 }
-
-type Config struct {
-	ConsumerKey string
-	AccessToken string
-}
