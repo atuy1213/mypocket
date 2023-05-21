@@ -32,7 +32,18 @@ func NewPocketClient() PocketClientInterface {
 func (u *PocketClient) GetAuthCode(ctx context.Context, consumerKey string) (string, error) {
 
 	endpoint := "https://getpocket.com/v3/oauth/request"
-	data := []byte(`{"consumer_key": "107363-f2dbdc562815cd3b57ecefb", "redirect_uri": "http://localhost:8989/oauth/idpresponse"}`)
+
+	param := struct {
+		ConsumerKey string `json:"consumer_key"`
+		RedirectURI string `json:"redirect_uri"`
+	}{
+		ConsumerKey: consumerKey,
+		RedirectURI: "http://localhost:8989/oauth/idpresponse",
+	}
+	data, err := json.Marshal(param)
+	if err != nil {
+		return "", err
+	}
 
 	req, err := http.NewRequest("POST", endpoint, bytes.NewBuffer(data))
 	if err != nil {
@@ -67,15 +78,20 @@ func (u *PocketClient) GetAuthCode(ctx context.Context, consumerKey string) (str
 
 func (u *PocketClient) Authorize(ctx context.Context, code string) (string, error) {
 
+	endpoint := "https://getpocket.com/auth/authorize"
+	URL, _ := url.Parse(endpoint)
+	query := URL.Query()
+	query.Add("request_token", code)
+	query.Add("redirect_uri", "http://localhost:8989/oauth/idpresponse")
+	URL.RawQuery = query.Encode()
+
 	l, err := net.Listen("tcp", "localhost:8989")
 	if err != nil {
 		log.Fatalln(err)
 	}
 	defer l.Close()
 
-	if err := open.Start(
-		fmt.Sprintf("https://getpocket.com/auth/authorize?request_token=%s&redirect_uri=http://localhost:8989/oauth/idpresponse", code),
-	); err != nil {
+	if err := open.Start(URL.String()); err != nil {
 		return "", err
 	}
 
@@ -96,7 +112,18 @@ func (u *PocketClient) Authorize(ctx context.Context, code string) (string, erro
 func (u *PocketClient) GetAccessToken(ctx context.Context, consumerKey, code string) (string, error) {
 
 	endpoint := "https://getpocket.com/v3/oauth/authorize"
-	data := []byte(fmt.Sprintf(`{"consumer_key": "107363-f2dbdc562815cd3b57ecefb", "code": "%s"}`, code))
+
+	param := struct {
+		ConsumerKey string `json:"consumer_key"`
+		Code        string `json:"code"`
+	}{
+		ConsumerKey: consumerKey,
+		Code:        code,
+	}
+	data, err := json.Marshal(param)
+	if err != nil {
+		return "", err
+	}
 
 	req, err := http.NewRequest("POST", endpoint, bytes.NewBuffer(data))
 	if err != nil {
@@ -147,8 +174,6 @@ func (u *PocketClient) AddArticle(ctx context.Context, URL string) error {
 	if err != nil {
 		return err
 	}
-
-	fmt.Println(string(data))
 
 	req, err := http.NewRequest("POST", endpoint, bytes.NewBuffer(data))
 	if err != nil {
