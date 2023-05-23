@@ -9,6 +9,7 @@ import (
 	"log"
 
 	"github.com/atuy1213/mypocket/pkg/pocket"
+	"github.com/atuy1213/mypocket/pkg/usecase"
 	"github.com/spf13/cobra"
 )
 
@@ -31,9 +32,11 @@ to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		URL := args[0]
 
-		client := pocket.NewPocketClient()
+		pocket := pocket.NewPocketClient()
+		executor := usecase.NewAddExecutor(pocket)
+
 		ctx := context.Background()
-		if err := client.AddArticle(ctx, URL); err != nil {
+		if err := executor.Add(ctx, URL); err != nil {
 			log.Fatalln(err)
 		}
 	},
