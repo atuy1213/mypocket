@@ -39,9 +39,9 @@ changelog:
       - '^docs:'
       - '^test:'
 brews:
-  - tap:
+  tap:
     owner: atuy1213
-    name: homebrew-tap # Homebrew Taps 用のリポジトリ名
+    name: homebrew-tap
     token: "{{ .Env.TAP_GITHUB_TOKEN }}"
 
 # The lines beneath this are called `modelines`. See `:help modeline`
