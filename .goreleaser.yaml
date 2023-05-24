@@ -39,7 +39,7 @@ changelog:
       - '^docs:'
       - '^test:'
 brews:
-  tap:
+  - tap:
     owner: atuy1213
     name: homebrew-tap
     token: "{{ .Env.TAP_GITHUB_TOKEN }}"
