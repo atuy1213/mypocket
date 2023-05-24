@@ -40,9 +40,9 @@ changelog:
       - '^test:'
 brews:
   - tap:
-    owner: atuy1213
-    name: homebrew-tap
-    token: "{{ .Env.TAP_GITHUB_TOKEN }}"
+      owner: atuy1213
+      name: homebrew-tap
+      token: "{{ .Env.TAP_GITHUB_TOKEN }}"
 
 # The lines beneath this are called `modelines`. See `:help modeline`
 # Feel free to remove those if you don't want/use them.
