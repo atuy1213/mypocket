@@ -7,6 +7,7 @@ import (
 	"context"
 	"log"
 
+	"github.com/atuy1213/mypocket/pkg/config"
 	"github.com/atuy1213/mypocket/pkg/pocket"
 	"github.com/atuy1213/mypocket/pkg/usecase"
 	"github.com/spf13/cobra"
@@ -21,7 +22,8 @@ You need to register consumer key at pocket.
 For more inofmation, see at https://getpocket.com/developer/apps/new`,
 	Run: func(cmd *cobra.Command, args []string) {
 		pocket := pocket.NewPocketClient()
-		executor := usecase.NewLoginExecutor(pocket)
+		config := config.NewConfig()
+		executor := usecase.NewLoginExecutor(pocket, config)
 
 		ctx := context.Background()
 		if err := executor.Login(ctx); err != nil {

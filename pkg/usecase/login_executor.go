@@ -6,17 +6,23 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/atuy1213/mypocket/pkg/config"
 	"github.com/atuy1213/mypocket/pkg/pocket"
 	"github.com/spf13/viper"
 )
 
 type LoginExecutor struct {
-	pocket pocket.PocketClientInterface
+	pocket   pocket.PocketClientInterface
+	constant config.ConfigInterface
 }
 
-func NewLoginExecutor(pocket pocket.PocketClientInterface) *LoginExecutor {
+func NewLoginExecutor(
+	pocket pocket.PocketClientInterface,
+	constant config.ConfigInterface,
+) *LoginExecutor {
 	return &LoginExecutor{
-		pocket: pocket,
+		pocket:   pocket,
+		constant: constant,
 	}
 }
 

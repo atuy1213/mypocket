@@ -8,6 +8,7 @@ import (
 	"errors"
 	"log"
 
+	"github.com/atuy1213/mypocket/pkg/interceptor"
 	"github.com/atuy1213/mypocket/pkg/pocket"
 	"github.com/atuy1213/mypocket/pkg/usecase"
 	"github.com/spf13/cobra"
@@ -16,7 +17,7 @@ import (
 // addCmd represents the add command
 var addCmd = &cobra.Command{
 	Use:   "add",
-	Short: "A brief description of your command",
+	Short: "add to your pocket",
 	Long: `A longer description that spans multiple lines and likely contains examples
 and usage of using your command. For example:
 
@@ -33,7 +34,8 @@ to quickly create a Cobra application.`,
 		URL := args[0]
 
 		pocket := pocket.NewPocketClient()
-		executor := usecase.NewAddExecutor(pocket)
+		authInterceptor := interceptor.NewAuthInterceptor()
+		executor := usecase.NewAddExecutor(pocket, authInterceptor)
 
 		ctx := context.Background()
 		if err := executor.Add(ctx, URL); err != nil {
